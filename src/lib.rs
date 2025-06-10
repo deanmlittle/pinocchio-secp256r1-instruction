@@ -13,16 +13,16 @@ pub const SECP256R1_COMPRESSED_PUBKEY_LENGTH: usize = 33;
 pub type Secp256r1Pubkey = [u8; SECP256R1_COMPRESSED_PUBKEY_LENGTH];
 pub type Secp256r1Signature = [u8; SECP256R1_SIGNATURE_LENGTH];
 
-pub struct Secp256r1Instruction<'info> {
+pub struct Secp256r1Instruction<'a> {
     header: Secp256r1InstructionHeader,
-    offsets: &'info [Secp256r1SignatureOffsets],
-    data: &'info [u8],
+    offsets: &'a [Secp256r1SignatureOffsets],
+    data: &'a [u8],
 }
 
-impl<'info> TryFrom<&'info [u8]> for Secp256r1Instruction<'info> {
+impl<'a> TryFrom<&'a [u8]> for Secp256r1Instruction<'a> {
     type Error = ProgramError;
 
-    fn try_from(data: &'info [u8]) -> Result<Self, Self::Error> {
+    fn try_from(data: &'a [u8]) -> Result<Self, Self::Error> {
         // We can skip this check, as it's done by the Secp256r1 Program
         #[cfg(not(feature = "perf"))]
         if data.len() < 2 {
@@ -54,10 +54,10 @@ impl<'info> TryFrom<&'info [u8]> for Secp256r1Instruction<'info> {
     }
 }
 
-impl<'info> TryFrom<&'info IntrospectedInstruction<'info>> for Secp256r1Instruction<'info> {
+impl<'a> TryFrom<&'a IntrospectedInstruction<'a>> for Secp256r1Instruction<'a> {
     type Error = ProgramError;
 
-    fn try_from(ix: &'info IntrospectedInstruction<'info>) -> Result<Self, Self::Error> {
+    fn try_from(ix: &'a IntrospectedInstruction<'a>) -> Result<Self, Self::Error> {
         if SECP256R1_PROGRAM_ID.ne(ix.get_program_id()) {
             return Err(ProgramError::IncorrectProgramId);
         }
@@ -81,7 +81,7 @@ pub struct Secp256r1SignatureOffsets {
     pub message_instruction_index: u16,
 }
 
-impl<'info> Secp256r1Instruction<'info> {
+impl<'a> Secp256r1Instruction<'a> {
     /// Get the number of signatures in this instruction
     #[inline(always)]
     pub fn num_signatures(&self) -> u8 {
@@ -207,7 +207,7 @@ impl Secp256r1SignatureOffsets {
 
     /// Get the message data from local instruction data
     #[inline(always)]
-    pub fn get_message_data<'info>(&self, data: &'info [u8]) -> Result<&'info [u8], ProgramError> {
+    pub fn get_message_data<'a>(&self, data: &'a [u8]) -> Result<&'a [u8], ProgramError> {
         let start = self.message_data_offset as usize;
         let end = start + self.message_data_size as usize;
 
@@ -248,7 +248,7 @@ impl Secp256r1SignatureOffsets {
     ///
     /// The caller must ensure that the offset and length are within bounds of the data
     #[inline(always)]
-    pub unsafe fn get_message_data_unchecked<'info>(&self, data: &'info [u8]) -> &'info [u8] {
+    pub unsafe fn get_message_data_unchecked<'a>(&self, data: &'a [u8]) -> &'a [u8] {
         let start = self.message_data_offset as usize;
         let end = start + self.message_data_size as usize;
         &data[start..end]
