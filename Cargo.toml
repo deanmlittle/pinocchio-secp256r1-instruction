@@ -1,6 +1,7 @@
 [package]
 name = "pinocchio-secp256r1-instruction"
 authors = ["Dean Little <@deanmlittle>"]
+description = "Pinocchio helper functions to deserialize Secp256r1 instructions"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
