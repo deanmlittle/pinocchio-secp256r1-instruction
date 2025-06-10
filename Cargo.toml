@@ -1,0 +1,16 @@
+[package]
+name = "pinocchio-secp256r1-instruction"
+authors = ["Dean Little <@deanmlittle>"]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[features]
+default = []
+perf = []
+
+[dependencies]
+pinocchio = "^0.8.0"
