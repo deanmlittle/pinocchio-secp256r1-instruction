@@ -1,3 +1,5 @@
+#![no_std]
+
 use pinocchio::{
     program_error::ProgramError, pubkey::Pubkey, sysvars::instructions::IntrospectedInstruction,
 };
